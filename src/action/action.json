@@ -1,0 +1,54 @@
+{
+  "actions": [
+    {
+      "description": "Main intent",
+      "name": "MAIN",
+      "fulfillment": {
+        "conversationName": "BolcomMain"
+      },
+      "intent": {
+        "name": "actions.intent.MAIN",
+        "trigger": {
+          "queryPatterns": [
+            "Bol.com",
+            "buy something from Bol.com",
+            "buy some books",
+            "buy some e-books"
+          ]
+        }
+      }
+    },
+    {
+      "description": "Buy intent",
+      "name": "BUY",
+      "fulfillment": {
+        "conversationName": "BolcomBuy"
+      },
+      "intent": {
+        "name": "bolcom.intent.BUY",
+        "parameters": [{
+          "name": "title",
+          "type": "BookTitle"
+        }],
+        "trigger": {
+          "queryPatterns": [
+            "Buy $BookTitle:title",
+            "Buy $BookTitle:title e-book"
+          ]
+        }
+      }
+    }
+  ],
+  "conversations": {
+    "BolcomMain": {
+      "name": "BolcomMain",
+      "url": "https://bolcom-gactions.herokuapp.com",
+      "fulfillmentApiVersion": 2
+    },
+    "BolcomBuy": {
+      "name": "BolcomBuy",
+      "url": "https://bolcom-gactions.herokuapp.com",
+      "fulfillmentApiVersion": 2
+    }
+  }
+}

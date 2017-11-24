@@ -1,0 +1,11 @@
+{
+  "name": "bolcom",
+  "version": "1.0.0",
+  "dependencies": {
+    "actions-on-google": "^1.6.1",
+    "express": "^4.16.2"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
