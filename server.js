@@ -9,7 +9,7 @@ const app = express();
 
 app.use(bodyParser.json({ type: 'application/*+json' }))
 
-app.get('/', bolcomFunction);
+app.all('/', bolcomFunction);
 
 app.listen(port, function () {
   console.log(`Example app listening on port ${port}`)
