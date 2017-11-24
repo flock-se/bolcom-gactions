@@ -1,0 +1,53 @@
+{
+  "actions": [
+    {
+      "description": "Welcome intent",
+      "name": "HELLO",
+      "fulfillment": {
+        "conversationName": "Bol.comHello"
+      },
+      "intent": {
+        "name": "actions.intent.HELLO",
+        "trigger": {
+          "queryPatterns": [
+            {"queryPattern": "Bol.com"},
+            {"queryPattern": "buy something from Bol.com"}
+          ]
+        }
+      }
+    },
+    {
+      "description": "Buy intent",
+      "name": "BUY",
+      "fulfillment": {
+        "conversationName": "Bol.comBuy"
+      },
+      "intent": {
+        "name": "actions.intent.BUY",
+        "parameters": [{
+          "name": "title",
+          "type": "BookTitle"
+        }],
+        "trigger": {
+          "queryPatterns": [
+            {"queryPattern": "buy some books"},
+            {"queryPattern": "buy some e-books"},
+            {"queryPattern": "buy something from Bol.com"}
+          ]
+        }
+      }
+    }
+  ],
+  "conversations": {
+    "Bol.comHello": {
+      "name": "bol.comHello",
+      "url": "www.bol.com",
+      "fulfillmentApiVersion": 2
+    },
+    "Bol.comBuy": {
+      "name": "bol.comBuy",
+      "url": "www.bol.com",
+      "fulfillmentApiVersion": 2
+    }
+  }
+}
