@@ -3,6 +3,9 @@
 const ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
 
 exports.bolcomFunction= (req, res) => {
+
+  console.log(req.body);
+
   const app = new ActionsSdkApp({request: req, response: res});
 
   // Create functions to handle requests here

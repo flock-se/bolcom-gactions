@@ -7,6 +7,7 @@
     "express": "^4.16.2"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "update": "./bin/gactions update --action_package src/action/action.json --project bolcom-3edd7"
   }
 }
