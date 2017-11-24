@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "actions-on-google": "^1.6.1",
+    "body-parser": "^1.18.2",
     "express": "^4.16.2"
   },
   "scripts": {
