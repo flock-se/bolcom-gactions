@@ -1,5 +1,9 @@
 'use strict';
 
+const START_STATE = 'start';
+const BUY_STATE = 'buy';
+const CONFIRM_STATE = 'confirm';
+
 const ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
 
 exports.bolcomFunction= (req, res) => {
@@ -8,46 +12,89 @@ exports.bolcomFunction= (req, res) => {
   console.log(req.body);
 
   const app = new ActionsSdkApp({request: req, response: res});
+  console.log(`Version: ${app.getApiVersion()}`)
 
-  // Create functions to handle requests here
+  function createState(state, data) {
+    return JSON.stringify({state, data});
+  }
+
+  function parseState(dialogState) {
+    if (dialogState === undefined || dialogState === null || dialogState.state === undefined || dialogState.state === null)
+      return START_STATE;
+    else
+      return dialogState.state;
+  }
+
   function mainIntent (app) {
-    console.log("Main intent")
+    console.log('Main intent');
     let inputPrompt = app.buildInputPrompt(false,
-        'Welcome to the Bol dot com app. Would you like to order something?');
+        'Welcome to the Bol dot com app. Would you like to order something?', createState(BUY_STATE));
     app.ask(inputPrompt);
   }
 
   function buyIntent(app) {
-    console.log("Buy intent");
+    console.log('Buy intent');
     let argument = app.getArgument();
-    console.log(`argument: ${argument}`);
-    let inputPrompt = app.buildInputPrompt(false, `You want to buy ${argument}`);
-    app.tell({speech: inputPrompt, displayText: inputPrompt});
+    console.log('argument:');
+    console.log(argument);
+    app.askForConfirmation(`Are you sure you want to buy ${argument}?`, createState(CONFIRM_STATE, {bookTitle: argument}));
+  }
+
+  function confirmIntent(app) {
+    let bookTitle = app.getDialogState().data.bookTitle;
+    console.log('Confirmed purchase of:');
+    console.log(bookTitle);
+    app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}`);
+    // TODO; actually do the order
+    setTimeout(function(){confirmOrder(app)}, 3000);
+  }
+
+  function confirmOrder(app) {
+    // TODO: get the delivery time from bol.com and give it to the user
+    app.tell(`Order complete. It will arrive at ${getDeliveryAddress(app)} tomorrow at 9 am.`)
   }
 
   function unknownIntent(app) {
-    console.log("Unknown intent");
+    console.log('Unknown intent');
     app.ask("I'm not sure what you mean, can you repeat?");
   }
 
+  function getUserName(app) {
+    const userName = app.getUserName();
+    if (userName === null)
+      return 'Unknown';
+    else 
+      return userName.displayName;
+  }
+
+  function getDeliveryAddress(app) {
+    const deliveryAddress = app.getDeliveryAddress();
+    if (deliveryAddress === null)
+      return 'Unknown address';
+    else 
+      return deliveryAddress.address;
+  }
+
   function responseHandler(app) {
-    console.log("Handling response");
-    // doesn't work:
-    // const intent = app.getIntent();
-    const intent = req.body.intentName;
-    console.log(`Rceived intent: ${intent}`);
-    switch (intent) {
-      case 'bolcom.intent.main':
-      case null:
-      case undefined:
+    console.log('Handling response');
+    const intent = app.getIntent();
+    console.log(`Received intent: ${intent}`);
+    const dialogState = app.getDialogState();
+    console.log('Dialog state:');
+    console.log(dialogState);
+    const state = parseState(dialogState);
+    console.log(state);
+    switch(state) {
+      case START_STATE:
         mainIntent(app);
         break;
-  
-      case 'bolcom.intent.buy':
+      case BUY_STATE:
         buyIntent(app);
         break;
-      
-      default:
+      case CONFIRM_STATE:
+        confirmIntent(app);
+        break;
+      default: 
         unknownIntent(app);
     }
   }
