@@ -27,9 +27,7 @@ exports.bolcomFunction= (req, res) => {
 
   function mainIntent (app) {
     console.log('Main intent');
-    let inputPrompt = app.buildInputPrompt(false,
-        'Welcome to the Bol dot com app. Would you like to order something?', createState(BUY_STATE));
-    app.ask(inputPrompt);
+    app.ask('Welcome to the Bol dot com app. Would you like to order something?', createState(BUY_STATE));
   }
 
   function buyIntent(app) {
