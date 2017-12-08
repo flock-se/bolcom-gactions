@@ -14,7 +14,7 @@ exports.bolcomFunction= (req, res) => {
   const app = new ActionsSdkApp({request: req, response: res});
   console.log(`Version: ${app.getApiVersion()}`)
 
-  function createState(state, data) {
+  function createState(state, data={}) {
     return JSON.stringify({state, data});
   }
 
