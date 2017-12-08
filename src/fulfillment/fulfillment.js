@@ -19,10 +19,17 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function parseState(dialogState) {
-    if (dialogState === undefined || dialogState === null || dialogState.state === undefined || dialogState.state === null)
+    if (dialogState === undefined || dialogState === null)
+      return START_STATE;
+
+    const parsedState = dialogState;
+    if (typeof dialogState === "string")
+      parsedState = JSON.parse(dialogState);
+    console.log(parsedState);
+    if (parsedState.state === undefined || parsedState.state === null)
       return START_STATE;
     else
-      return dialogState.state;
+      return parsedState.state;
   }
 
   function mainIntent (app) {
