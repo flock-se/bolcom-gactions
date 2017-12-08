@@ -39,6 +39,7 @@ exports.bolcomFunction= (req, res) => {
     switch (intent) {
       case 'bolcom.intent.main':
       case null:
+      case undefined:
         mainIntent(app);
         break;
   
