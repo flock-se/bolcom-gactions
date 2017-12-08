@@ -7,13 +7,13 @@
         "conversationName": "BolcomMain"
       },
       "intent": {
-        "name": "actions.intent.MAIN",
+        "name": "bolcom.intent.MAIN",
         "trigger": {
           "queryPatterns": [
-            "Bol.com",
-            "buy something from Bol.com",
+            "Bol dot com",
+            "buy something from Bol dot com",
             "buy some books",
-            "buy some e-books"
+            "buy some e books"
           ]
         }
       }

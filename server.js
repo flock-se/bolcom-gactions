@@ -7,7 +7,7 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
-app.use(bodyParser.json({ type: 'application/*+json' }))
+app.use(bodyParser.json({type: 'application/json'}));
 
 app.all('*', bolcomFunction);
 
