@@ -40,6 +40,28 @@ exports.bolcomFunction= (req, res) => {
       return parsedState.state;
   }
 
+  function parseData(dialogState) {
+    console.log("Parse the dialog state data");
+    console.log(dialogState);
+
+    if (dialogState === undefined || dialogState === null)
+      return {};
+
+    console.log(typeof dialogState);
+
+    let parsedState = dialogState;
+    if (typeof dialogState === "string")
+      parsedState = JSON.parse(dialogState);
+
+    console.log(parsedState);
+    console.log(parsedState.data);
+
+    if (parsedState.data === undefined || parsedState.data === null)
+      return {};
+    else
+      return parsedState.data;
+  }
+
   function mainIntent (app) {
     console.log('Main intent');
     app.ask('Welcome to the Bol dot com app. Would you like to order something?', createState(BUY_STATE));
@@ -54,7 +76,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmIntent(app) {
-    let bookTitle = app.getDialogState().data.bookTitle;
+    let bookTitle = parseData(app.getDialogState()).bookTitle;
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
     app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}`);
