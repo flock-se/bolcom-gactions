@@ -19,13 +19,21 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function parseState(dialogState) {
+    console.log("Parse the dialog state");
+    console.log(dialogState);
+    
     if (dialogState === undefined || dialogState === null)
       return START_STATE;
+
+    console.log(typeof dialogState);
 
     const parsedState = dialogState;
     if (typeof dialogState === "string")
       parsedState = JSON.parse(dialogState);
+
     console.log(parsedState);
+    console.log(parsedState.state);
+
     if (parsedState.state === undefined || parsedState.state === null)
       return START_STATE;
     else
