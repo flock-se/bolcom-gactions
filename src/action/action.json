@@ -28,22 +28,12 @@
         "name": "bol.intent.BUY",
         "parameters": [{
           "name": "title",
-          "type": {
-            "name": "BookTitle",
-            "entities": [
-              {
-                "key": "The Lord of the Rings",
-                "synonyms": [
-                  "Lord of the Rings"
-                ]
-              }
-            ]
-          }
+          "type": "BookTitle"
         }],
         "trigger": {
           "queryPatterns": [
-            "Buy $BookTitle:title",
-            "Buy $BookTitle:title e-book"
+            "Order $BookTitle:title",
+            "Buy $BookTitle:title"
           ]
         }
       }
@@ -80,5 +70,19 @@
       "url": "https://bolcom-gactions.herokuapp.com",
       "fulfillmentApiVersion": 2
     }
-  }
+  },
+  "types": [
+    {
+      "name": "BookTitle",
+      "entities": [
+        {
+          "key": "The Lord of the Rings",
+          "synonyms": [
+            "Lord of the Rings"
+          ]
+        }
+      ],
+      "isUserDefined": false
+    }
+  ]
 }

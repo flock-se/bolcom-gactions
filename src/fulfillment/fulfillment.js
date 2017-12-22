@@ -64,7 +64,20 @@ exports.bolcomFunction= (req, res) => {
 
   function mainIntent (app) {
     console.log('Main intent');
-    app.ask('Welcome to the Bol dot com app. Would you like to order something?', createState(BUY_STATE));
+    app.ask('Welcome to the Bol dot com app. What would you like to order?', createState(BUY_STATE));
+    let jsonResponse = {
+      expectUserResponse: true,
+      expectedInputs: [
+        {
+          possibleIntents: [
+            {
+              intent: "bol.intent.BUY",
+            }
+          ]
+        }
+      ]
+    };
+    res.json(expectedInputs);
   }
 
   function buyIntent(app) {
