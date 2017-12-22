@@ -37,6 +37,21 @@
           ]
         }
       }
+    },
+    {
+      "description": "Horse intent",
+      "name": "Horse",
+      "fulfillment": {
+        "conversationName": "BolcomHorse"
+      },
+      "intent": {
+        "name": "bolcom.intent.HORST",
+        "trigger": {
+          "queryPatterns": [
+            "Ride a horse"
+          ]
+        }
+      }
     }
   ],
   "conversations": {
@@ -47,6 +62,11 @@
     },
     "BolcomBuy": {
       "name": "BolcomBuy",
+      "url": "https://bolcom-gactions.herokuapp.com",
+      "fulfillmentApiVersion": 2
+    },
+    "BolcomHorse": {
+      "name": "BolcomHorse",
       "url": "https://bolcom-gactions.herokuapp.com",
       "fulfillmentApiVersion": 2
     }
