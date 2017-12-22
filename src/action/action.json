@@ -7,7 +7,7 @@
         "conversationName": "BolcomMain"
       },
       "intent": {
-        "name": "bolcom.intent.MAIN",
+        "name": "actions.intent.MAIN",
         "trigger": {
           "queryPatterns": [
             "Bol dot com",
@@ -22,10 +22,10 @@
       "description": "Buy intent",
       "name": "BUY",
       "fulfillment": {
-        "conversationName": "BolcomBuy"
+        "conversationName": "BolcomMain"
       },
       "intent": {
-        "name": "bolcom.intent.BUY",
+        "name": "bol.intent.BUY",
         "parameters": [{
           "name": "title",
           "type": "BookTitle"
@@ -42,10 +42,10 @@
       "description": "Horse intent",
       "name": "Horse",
       "fulfillment": {
-        "conversationName": "BolcomHorse"
+        "conversationName": "BolcomMain"
       },
       "intent": {
-        "name": "bolcom.intent.HORST",
+        "name": "bol.intent.HORSE",
         "trigger": {
           "queryPatterns": [
             "Ride a horse"
