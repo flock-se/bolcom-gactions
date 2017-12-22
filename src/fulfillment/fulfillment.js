@@ -9,7 +9,7 @@ const ActionsSdkApp = require('actions-on-google').ActionsSdkApp;
 exports.bolcomFunction= (req, res) => {
 
   console.log("Request body:");
-  console.log(req.body);
+  console.log(JSON.stringify(req.body));
 
   const app = new ActionsSdkApp({request: req, response: res});
   console.log(`Version: ${app.getApiVersion()}`)
