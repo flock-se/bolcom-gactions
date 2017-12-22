@@ -28,7 +28,17 @@
         "name": "bol.intent.BUY",
         "parameters": [{
           "name": "title",
-          "type": "BookTitle"
+          "type": {
+            "name": "BookTitle",
+            "entities": [
+              {
+                "key": "The Lord of the Rings",
+                "synonyms": [
+                  "Lord of the Rings"
+                ]
+              }
+            ]
+          }
         }],
         "trigger": {
           "queryPatterns": [
