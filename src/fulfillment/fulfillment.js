@@ -64,17 +64,18 @@ exports.bolcomFunction= (req, res) => {
 
   function mainIntent (app) {
     console.log('Main intent');
-    const expectedIntent = app.buildExpectedIntent_("bol.intents.BUY", []);
+    const expectedIntent = app.buildExpectedIntent_("bol.intent.BUY", []);
     if (!expectedIntent) {
       console.error("Error in building expected intent");
       return null;
     }
+    console.log(expectedIntent);
     let inputPrompt = 'Welcome to the Bol dot com app. What would you like to order?';
     let dialogState = createState(BUY_STATE);
     app.buildAskHelper_(inputPrompt, [expectedIntent], dialogState);
    // app.ask('Welcome to the Bol dot com app. What would you like to order?', dialogState);
     console.log("Response:");
-    console.log(res);
+    console.log(res.body);
   }
 
   function buyIntent(app) {
