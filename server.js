@@ -13,8 +13,8 @@ app.post('/', function(request, response) {
   console.log('headers:' + JSON.stringify(request.headers));
   console.log('body:' + JSON.stringify(request.body));
 
-  bolcomFunction(request, response);
   response.append("Google-Assistant-API-Version", "v1");
+  bolcomFunction(request, response);
 });
 
 app.listen(port, function () {
