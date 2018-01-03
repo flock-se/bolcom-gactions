@@ -19,6 +19,8 @@ exports.bolcomFunction= (req, res) => {
     const contexts = app.getContexts();
     console.log('Contexts:');
     console.log(contexts);
+    console.log("User:");
+    console.log(getUserName(app));
 
     switch(intent) {
       case BUY_INTENT:
@@ -60,7 +62,7 @@ exports.bolcomFunction= (req, res) => {
     const bookTitle = app.getContext('bookTitle').parameters;
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
-    app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}.`);
+    app.tell(`Ok, placing order for ${bookTitle}.`);
     // TODO: actually do the order
   }
 
