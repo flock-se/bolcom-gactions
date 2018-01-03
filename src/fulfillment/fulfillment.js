@@ -16,10 +16,10 @@ exports.bolcomFunction= (req, res) => {
     console.log('Handling response');
     const intent = app.getIntent();
     console.log(`Received intent: ${intent}`);
+    const contexts = app.getContexts();
     console.log('Contexts:');
-    app.getContexts().forEach(element => {
-      console.log(element);
-    });
+    console.log(contexts);
+    
     switch(intent) {
       case BUY_INTENT:
         buyState(app);
