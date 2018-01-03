@@ -8,9 +8,6 @@ const DialogFlowApp = require('actions-on-google').DialogflowApp;
 
 exports.bolcomFunction= (req, res) => {
 
-  console.log("Request body:");
-  console.log(JSON.stringify(req.body));
-
   const app = new DialogFlowApp({request: req, response: res});
 
 
@@ -19,6 +16,10 @@ exports.bolcomFunction= (req, res) => {
     console.log('Handling response');
     const intent = app.getIntent();
     console.log(`Received intent: ${intent}`);
+    console.log('Contexts:');
+    app.getContexts().forEach(element => {
+      console.log(element);
+    });
     switch(intent) {
       case BUY_INTENT:
         buyState(app);
