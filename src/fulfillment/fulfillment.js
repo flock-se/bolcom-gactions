@@ -59,7 +59,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const bookTitle = app.getContext('buyintent-followup').parameters.BlookTitle;
+    const bookTitle = app.getContext('start').parameters.BookTitle;
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
     app.tell(`Ok, placing order for ${bookTitle}.`);
