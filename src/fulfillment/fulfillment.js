@@ -16,7 +16,6 @@ exports.bolcomFunction= (req, res) => {
   console.log(JSON.stringify(req.body));
 
   const app = new DialogFlowApp({request: req, response: res});
-  console.log(`App version: ${app.getApiVersion()}`)
 
 
   // Handles the user request
