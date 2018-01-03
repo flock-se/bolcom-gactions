@@ -1,8 +1,8 @@
 'use strict';
 
 const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
-const YES_INTENT = 'intents.yes'
-const NO_INTENT = 'intents.no';
+const YES_INTENT = 'Buyintent.Buyintent-yes'
+const NO_INTENT = 'Buyintent.Buyintent-no';
 
 const DialogFlowApp = require('actions-on-google').DialogflowApp;
 
@@ -25,8 +25,10 @@ exports.bolcomFunction= (req, res) => {
         buyState(app);
         break;
       case YES_INTENT:
-      case NO_INTENT:
         confirmState(app);
+        break;
+      case NO_INTENT:
+        rejectState(app);
         break;
       default: 
         unknownState(app);
@@ -55,18 +57,15 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const intent = app.getIntent();
-    if (intent === YES_INTENT) {
-      const bookTitle = app.getContext('bookTitle').parameters;
-      console.log('Confirmed purchase of:');
-      console.log(bookTitle);
-      app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}.`);
-      // TODO: actually do the order
-    } else if (intent === NO_INTENT) {
-      app.tell('Ok, try again when you are ready.')
-    } else {
-      unknownState(app);
-    }
+    const bookTitle = app.getContext('bookTitle').parameters;
+    console.log('Confirmed purchase of:');
+    console.log(bookTitle);
+    app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}.`);
+    // TODO: actually do the order
+  }
+
+  function rejectState(app) {
+    app.ask('Ok, what book would you like to buy?');
   }
 
   function confirmOrder(app) {
