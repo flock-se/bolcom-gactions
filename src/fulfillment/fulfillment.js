@@ -51,7 +51,7 @@ exports.bolcomFunction= (req, res) => {
     console.log(bookTitle);
     // TODO: call bol.com api with the book title, get full title name and price and add this
     // to the confirmation question.
-    app.setContext('bookTitle', 1, bookTitle);
+    app.setContext('bookTitle', 4, bookTitle);
     app.ask(`Are you sure you want to buy ${bookTitle}?`,
       [`Do you want to buy ${bookTitle}?`, 
       `Confirm whether you want to buy ${bookTitle}.`, 
