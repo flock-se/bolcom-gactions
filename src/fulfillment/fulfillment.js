@@ -37,13 +37,13 @@ exports.bolcomFunction= (req, res) => {
 
   function buyState(app) {
     console.log('Buy state');
-    let argument = app.getArgument();
-    console.log('argument:');
-    console.log(argument);
+    const bookTitle = app.getContext('start').parameters.bookTitle;
+    console.log('bookTitle:');
+    console.log(bookTitle);
     // TODO: call bol.com api with argument, get full title name and price and add this
-    // to the confimation question.
-    app.setContext('bookTitle', 1, argument);
-    app.ask(`Are you sure you want to buy ${argument}?`);
+    // to the confirmation question.
+    app.setContext('bookTitle', 1, bookTitle);
+    app.ask(`Are you sure you want to buy ${bookTitle}?`);
   }
 
   function confirmState(app) {
