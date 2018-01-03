@@ -2,7 +2,7 @@
   "name": "bolcom",
   "version": "1.0.0",
   "dependencies": {
-    "actions-on-google": "^1.6.1",
+    "actions-on-google": "^1.7.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2"
   },
