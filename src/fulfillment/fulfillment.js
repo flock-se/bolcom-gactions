@@ -1,6 +1,6 @@
 'use strict';
 
-const BUY_INTENT = 'intents.buy';
+const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
 const YES_INTENT = 'intents.yes'
 const NO_INTENT = 'intents.no';
 
@@ -19,7 +19,7 @@ exports.bolcomFunction= (req, res) => {
     const contexts = app.getContexts();
     console.log('Contexts:');
     console.log(contexts);
-    
+
     switch(intent) {
       case BUY_INTENT:
         buyState(app);
@@ -42,13 +42,14 @@ exports.bolcomFunction= (req, res) => {
     console.log(argument);
     // TODO: call bol.com api with argument, get full title name and price and add this
     // to the confimation question.
+    app.setContext('bookTitle', 1, argument);
     app.ask(`Are you sure you want to buy ${argument}?`);
   }
 
   function confirmState(app) {
     const intent = app.getIntent();
     if (intent === YES_INTENT) {
-      const bookTitle = parseData(app.getDialogState()).bookTitle;
+      const bookTitle = app.getContext('bookTitle').parameters;
       console.log('Confirmed purchase of:');
       console.log(bookTitle);
       app.tell(`Ok ${getUserName(app)}, buying ${bookTitle}.`);

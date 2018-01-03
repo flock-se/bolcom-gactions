@@ -14,8 +14,6 @@ app.post('/', function(request, response) {
   console.log('body:' + JSON.stringify(request.body));
 
   bolcomFunction(request, response);
-
-  response.sendStatus(200);
 });
 
 app.listen(port, function () {
