@@ -37,7 +37,16 @@ exports.bolcomFunction= (req, res) => {
 
   function buyState(app) {
     console.log('Buy state');
-    const bookTitle = app.getContext('start').parameters.bookTitle;
+    
+    console.log("Argument:");
+    console.log(app.getArgument('book_title'));
+    console.log(app.getArgument('bookTitle'));
+
+    const context = app.getContext('start');
+    console.log("Context");
+    console.log(context);
+    
+    const bookTitle = context.parameters.BookTitle;
     console.log('bookTitle:');
     console.log(bookTitle);
     // TODO: call bol.com api with argument, get full title name and price and add this
