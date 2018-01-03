@@ -37,10 +37,6 @@ exports.bolcomFunction= (req, res) => {
 
   function buyState(app) {
     console.log('Buy state');
-    
-    console.log("Argument:");
-    console.log(app.getArgument('book_title'));
-    console.log(app.getArgument('bookTitle'));
 
     const context = app.getContext('start');
     console.log("Context");
@@ -49,10 +45,10 @@ exports.bolcomFunction= (req, res) => {
     const bookTitle = context.parameters.BookTitle;
     console.log('bookTitle:');
     console.log(bookTitle);
-    // TODO: call bol.com api with argument, get full title name and price and add this
+    // TODO: call bol.com api with the book title, get full title name and price and add this
     // to the confirmation question.
     app.setContext('bookTitle', 1, bookTitle);
-    app.ask(`Are you sure you want to buy ${bookTitle}?`);
+    app.askForConfirmation(`Are you sure you want to buy ${bookTitle}?`);
   }
 
   function confirmState(app) {
@@ -65,6 +61,8 @@ exports.bolcomFunction= (req, res) => {
       // TODO: actually do the order
     } else if (intent === NO_INTENT) {
       app.tell('Ok, try again when you are ready.')
+    } else {
+      unknownState(app);
     }
   }
 
