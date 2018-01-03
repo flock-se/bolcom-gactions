@@ -12,8 +12,8 @@ app.use(bodyParser.json({type: 'application/json'}));
 app.post('/', function(request, response) {
   console.log('headers:' + JSON.stringify(request.headers));
   console.log('body:' + JSON.stringify(request.body));
-  
-  dialogFlowApp(request, response);
+
+  bolcomFunction(request, response);
 
   response.sendStatus(200);
 });
