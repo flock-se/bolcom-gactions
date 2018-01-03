@@ -1,9 +1,5 @@
 'use strict';
 
-const START_STATE = 'start';
-const BUY_STATE = 'buy';
-const CONFIRM_STATE = 'confirm';
-
 const BUY_INTENT = 'intents.buy';
 const YES_INTENT = 'intents.yes'
 const NO_INTENT = 'intents.no';
@@ -23,16 +19,12 @@ exports.bolcomFunction= (req, res) => {
     console.log('Handling response');
     const intent = app.getIntent();
     console.log(`Received intent: ${intent}`);
-    const dialogState = app.getDialogState();
-    console.log('Dialog state:');
-    console.log(dialogState);
-    const state = parseState(dialogState);
-    console.log(state);
-    switch(state) {
-      case BUY_STATE:
+    switch(intent) {
+      case BUY_INTENT:
         buyState(app);
         break;
-      case CONFIRM_STATE:
+      case YES_INTENT:
+      case NO_INTENT:
         confirmState(app);
         break;
       default: 
@@ -49,8 +41,7 @@ exports.bolcomFunction= (req, res) => {
     console.log(argument);
     // TODO: call bol.com api with argument, get full title name and price and add this
     // to the confimation question.
-    app.askForConfirmation(`Are you sure you want to buy ${argument}?`, 
-                           createState(CONFIRM_STATE, {bookTitle: argument}));
+    app.ask(`Are you sure you want to buy ${argument}?`);
   }
 
   function confirmState(app) {
@@ -73,7 +64,7 @@ exports.bolcomFunction= (req, res) => {
 
   function unknownState(app) {
     console.log('Unknown state');
-    app.tell("Something went wrong");
+    app.tell('Something went wrong');
   }
 
   // HELPERS
