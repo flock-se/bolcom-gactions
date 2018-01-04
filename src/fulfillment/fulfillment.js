@@ -3,8 +3,9 @@
 const fetch = require('node-fetch');
 
 const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
-const YES_INTENT = 'Buyintent.Buyintent-yes'
+const YES_INTENT = 'Buyintent.Buyintent-yes';
 const NO_INTENT = 'Buyintent.Buyintent-no';
+const STOP_INTENT = 'Buyintent.Buyintent-cancel';
 
 const DialogFlowApp = require('actions-on-google').DialogflowApp;
 
@@ -40,8 +41,10 @@ exports.bolcomFunction= (req, res) => {
         confirmState(app);
         break;
       case NO_INTENT:
-        rejectState(app);
+        nextState(app);
         break;
+      case STOP_INTENT:
+        stopState(app);
       default: 
         unknownState(app);
     }
@@ -69,16 +72,16 @@ exports.bolcomFunction= (req, res) => {
           console.log(data);
 
           const nrOfResults = data.products.length;
-          // TODO: mechanism to skip to the next book.
           // TODO: there is more than 1 offer. Always find the bol.com offer (new book).
           // TODO: mechanism to send the result(s) to the user's phone.
-          const firstBook = data.products[0];
-          const firstTitle = firstBook.title;
-          const author = firstBook.specsTag;
-          const price = firstBook.offerData.offers[0].price;
+          const book = data.products[0];
+          const title = book.title;
+          const author = book.specsTag;
+          const price = book.offerData.offers[0].price;
 
-          app.setContext('selectedbook', 4, firstBook);
-          app.ask(`Found ${nrOfResults} books. The first one is ${firstTitle} by ${author} for ${price} euro. Do you want to order this one?`);
+          app.setContext('results', nrOfResults, data);
+          app.setContext('index', 1, {index: 0});
+          app.ask(`Found ${nrOfResults} books. Going through them one by one. Say stop if you want me to stop. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
         })
         .catch((error) => {
           console.log('Error:');
@@ -88,12 +91,15 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const argument = app.getContextArgument('selectedbook', 'title');
+    const argument = app.getContextArgument('results', 'data');
     if (argument === null || argument === undefined || argument.value === undefined) {
       // No book to confirm, redirect to the buy state
       buyState(app);
     } else {
-      const bookTitle = argument.value;
+      const data = argument.value;
+      let index = app.getContextArgument('index', 'index').value;
+
+      const bookTitle = data.products[index].title;
       console.log('Confirmed purchase of:');
       console.log(bookTitle);
       app.tell(`Ok, placing order for ${bookTitle}.`);
@@ -101,8 +107,27 @@ exports.bolcomFunction= (req, res) => {
     }
   }
 
-  function rejectState(app) {
-    app.setContext('selectedbook', 0, {});
+  function nextState(app) {
+    const argument = app.getContextArgument('results', 'data');
+    if (argument === null || argument === undefined || argument.value === undefined) {
+      // No products, redirect to the buy state
+      buyState(app);
+    } else {
+      const data = argument.value;
+      let index = app.getContextArgument('index', 'index').value + 1;
+
+      const book = data.products[index];
+      const title = book.title;
+      const author = book.specsTag;
+      const price = book.offerData.offers[0].price;
+
+      app.setContext('index', 1, {index});
+      app.ask(`The next one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+    }
+  }
+
+  function stopState(app) {
+    app.setContext('results', 0, {});
     app.ask('Ok, what book would you like to buy?');
   }
 
