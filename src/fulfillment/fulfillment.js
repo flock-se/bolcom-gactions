@@ -1,5 +1,7 @@
 'use strict';
 
+const fetch = require('node-fetch');
+
 const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
 const YES_INTENT = 'Buyintent.Buyintent-yes'
 const NO_INTENT = 'Buyintent.Buyintent-no';
