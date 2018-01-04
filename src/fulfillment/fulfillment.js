@@ -80,7 +80,7 @@ exports.bolcomFunction= (req, res) => {
           const price = book.offerData.offers[0].price;
 
           app.setContext('results', 5, {data, index: 0});
-          app.ask(`Found ${nrOfResults} books. Going through them one by one. Say stop if you want me to stop. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+          app.ask(`Found ${nrOfResults} books. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
         })
         .catch((error) => {
           console.log('Error:');
@@ -90,19 +90,28 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const argument = app.getContextArgument('results', 'data');
-    if (argument === null || argument === undefined || argument.value === undefined) {
+    const context = app.getContext('results');
+    if (context === null || context === undefined || context === {}) {
       // No book to confirm, redirect to the buy state
       buyState(app);
     } else {
-      const data = argument.value;
-      let index = app.getContextArgument('results', 'index').value;
+      const data = context.parameters.data;
+      let index = context.parameters.index;
+      if (index === -1) {
+        const book = data.products[0];
+        const title = book.title;
+        const author = book.specsTag;
+        const price = book.offerData.offers[0].price;
 
-      const bookTitle = data.products[index].title;
-      console.log('Confirmed purchase of:');
-      console.log(bookTitle);
-      app.tell(`Ok, placing order for ${bookTitle}.`);
-      // TODO: actually do the order
+        app.setContext('results', 5, {data, index: 0});
+        app.ask(`Ok, the first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+      } else {
+        const bookTitle = data.products[index].title;
+        console.log('Confirmed purchase of:');
+        console.log(bookTitle);
+        app.tell(`Ok, placing order for ${bookTitle}.`);
+        // TODO: actually do the order
+      }
     }
   }
 
@@ -113,17 +122,22 @@ exports.bolcomFunction= (req, res) => {
       // No products, redirect to the buy state
       buyState(app);
     } else {
-      console.log(context.parameters.index);
       const data = context.parameters.data;
       let index = context.parameters.index + 1;
+      if (index === 0) {
+        stopState(app);
+      } else if (index == data.products.length) {
+        app.setContext('results', 5, {data, index: -1});
+        app.ask('That was the last one. Do you want to start from the beginning?');
+      } else {
+        const book = data.products[index];
+        const title = book.title;
+        const author = book.specsTag;
+        const price = book.offerData.offers[0].price;
 
-      const book = data.products[index];
-      const title = book.title;
-      const author = book.specsTag;
-      const price = book.offerData.offers[0].price;
-
-      app.setContext('results', 5, {data, index});
-      app.ask(`The next one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+        app.setContext('results', 5, {data, index});
+        app.ask(`The next one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+      }
     }
   }
 
