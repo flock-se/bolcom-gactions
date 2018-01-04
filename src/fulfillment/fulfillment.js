@@ -88,14 +88,21 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const bookTitle = app.getContextArgument('selectedbook', 'title').value;
-    console.log('Confirmed purchase of:');
-    console.log(bookTitle);
-    app.tell(`Ok, placing order for ${bookTitle}.`);
-    // TODO: actually do the order
+    const argument = app.getContextArgument('selectedbook', 'title');
+    if (argument === null || argument === undefined || argument.value === undefined) {
+      // No book to confirm, redirect to the buy state
+      buyState(app);
+    } else {
+      const bookTitle = argument.value;
+      console.log('Confirmed purchase of:');
+      console.log(bookTitle);
+      app.tell(`Ok, placing order for ${bookTitle}.`);
+      // TODO: actually do the order
+    }
   }
 
   function rejectState(app) {
+    app.setContext('selectedbook', 0, {});
     app.ask('Ok, what book would you like to buy?');
   }
 
