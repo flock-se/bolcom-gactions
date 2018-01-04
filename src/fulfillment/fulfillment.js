@@ -107,13 +107,15 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function nextState(app) {
-    const argument = app.getContextArgument('results', 'data');
-    if (argument === null || argument === undefined || argument.value === undefined) {
+    console.log('next state');
+    const context = app.getContext('results');
+    if (context === null || context === undefined || context === {}) {
       // No products, redirect to the buy state
       buyState(app);
     } else {
-      const data = argument.value;
-      let index = app.getContextArgument('results', 'index').value + 1;
+      console.log(context.parameters.index);
+      const data = context.parameters.data;
+      let index = context.parameters.index + 1;
 
       const book = data.products[index];
       const title = book.title;
