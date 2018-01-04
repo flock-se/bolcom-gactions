@@ -68,7 +68,7 @@ exports.bolcomFunction= (req, res) => {
           console.log('Fetched data:');
           console.log(data);
 
-          const nrOfResults = data.products.size;
+          const nrOfResults = data.products.length;
           // TODO: mechanism to skip to the next book.
           // TODO: there is more than 1 offer. Always find the bol.com offer (new book).
           // TODO: mechanism to send the result(s) to the user's phone.
@@ -77,7 +77,7 @@ exports.bolcomFunction= (req, res) => {
           const author = firstBook.specsTag;
           const price = firstBook.offerData.offers[0].price;
 
-          app.setContext('selectedBook', 4, firstBook);
+          app.setContext('selectedbook', 4, firstBook);
           app.ask(`Found ${nrOfResults} books. The first one is ${firstTitle} by ${author} for ${price} euro. Do you want to order this one?`);
         })
         .catch((error) => {
@@ -88,7 +88,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const bookTitle = app.getContextArgument('selectedBook', 'title');
+    const bookTitle = app.getContextArgument('selectedbook', 'title');
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
     app.tell(`Ok, placing order for ${bookTitle}.`);
