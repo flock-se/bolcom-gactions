@@ -6,10 +6,18 @@ const NO_INTENT = 'Buyintent.Buyintent-no';
 
 const DialogFlowApp = require('actions-on-google').DialogflowApp;
 
+const base = 'http://api.bol.com/catalog/v4/search';
+// book category
+const ids = 8299;
+const key = process.env.KEY;
+
 exports.bolcomFunction= (req, res) => {
 
   const app = new DialogFlowApp({request: req, response: res});
 
+  function url(bookTitle) {
+    return `${base}?q=${encodeURIComponent(bookTitle)}&ids=${ids}&apikey=${key}&format=json`;
+  }
 
   // Handles the user request
   function responseHandler(app) {
@@ -24,7 +32,7 @@ exports.bolcomFunction= (req, res) => {
 
     switch(intent) {
       case BUY_INTENT:
-        buyState(app);
+        return buyState(app);
         break;
       case YES_INTENT:
         confirmState(app);
@@ -43,23 +51,42 @@ exports.bolcomFunction= (req, res) => {
     console.log('Buy state');
 
     const context = app.getContext('start');
-    console.log("Context");
+    console.log('Context:');
     console.log(context);
     
     const bookTitle = context.parameters.BookTitle;
     console.log('bookTitle:');
     console.log(bookTitle);
-    // TODO: call bol.com api with the book title, get full title name and price and add this
-    // to the confirmation question.
-    app.setContext(bookTitle, 4);
-    app.ask(`Are you sure you want to buy ${bookTitle}?`,
-      [`Do you want to buy ${bookTitle}?`, 
-      `Confirm whether you want to buy ${bookTitle}.`, 
-      'Try again when you are ready.']);
+
+    return fetch(url(bookTitle))
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          console.log('Fetched data:');
+          console.log(data);
+
+          const nrOfResults = data.products.size;
+          // TODO: mechanism to skip to the next book.
+          // TODO: there is more than 1 offer. Always find the bol.com offer (new book).
+          // TODO: mechanism to send the result(s) to the user's phone.
+          const firstBook = data.products[0];
+          const firstTitle = firstBook.title;
+          const author = firstBook.specsTag;
+          const price = firstBook.offerData.offers[0].price;
+
+          app.setContext('selectedBook', 4, firstBook);
+          app.ask(`Found ${nrOfResults} books. The first one is ${firstTitle} by ${author} for ${price} euro. Do you want to order this one?`);
+        })
+        .catch((error) => {
+          console.log('Error:');
+          console.log(error);
+          app.tell('Cannot contact Bol dot com, try again later.');
+        });
   }
 
   function confirmState(app) {
-    const bookTitle = app.getContext('start').parameters.BookTitle;
+    const bookTitle = app.getContextArgument('selectedBook', 'title');
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
     app.tell(`Ok, placing order for ${bookTitle}.`);
