@@ -79,7 +79,7 @@ exports.bolcomFunction= (req, res) => {
           const author = book.specsTag;
           const price = book.offerData.offers[0].price;
 
-          app.setContext('results', nrOfResults, data);
+          app.setContext('results', nrOfResults, {data});
           app.setContext('index', 1, {index: 0});
           app.ask(`Found ${nrOfResults} books. Going through them one by one. Say stop if you want me to stop. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
         })
