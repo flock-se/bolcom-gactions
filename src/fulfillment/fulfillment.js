@@ -74,13 +74,25 @@ exports.bolcomFunction= (req, res) => {
           const nrOfResults = data.products.length;
           // TODO: there is more than 1 offer. Always find the bol.com offer (new book).
           // TODO: mechanism to send the result(s) to the user's phone.
-          const book = data.products[0];
-          const title = book.title;
-          const author = book.specsTag;
-          const price = book.offerData.offers[0].price;
+          // const book = data.products[0];
+          // const title = book.title;
+          // const author = book.specsTag;
+          // const price = book.offerData.offers[0].price;
 
-          app.setContext('results', 5, {data, index: 0});
-          app.ask(`Found ${nrOfResults} books. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+          // app.setContext('results', 5, {data, index: 0});
+          // app.ask(`Found ${nrOfResults} books. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+
+          let index = 0;
+          items = data.products.map((book) => {            
+            index++;
+            const title = book.title;
+            const author = book.specsTag;
+            const price = book.offerData.offers[0].price;
+            return app.buildOptionItem(index, `${title} by ${author} for ${price} euros`)
+                      .setTitle(`Book ${index}`)
+          });          
+          app.askWithList(`Found ${nrOfResults} books. Which one would you like to buy?`,
+            app.buildList('Books').addItems(items));
         })
         .catch((error) => {
           console.log('Error:');
