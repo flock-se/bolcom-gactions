@@ -83,7 +83,7 @@ exports.bolcomFunction= (req, res) => {
           // app.ask(`Found ${nrOfResults} books. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
 
           let index = 0;
-          items = data.products.map((book) => {            
+          let items = data.products.map((book) => {            
             index++;
             const title = book.title;
             const author = book.specsTag;
