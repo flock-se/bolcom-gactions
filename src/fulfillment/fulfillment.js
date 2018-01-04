@@ -79,8 +79,7 @@ exports.bolcomFunction= (req, res) => {
           const author = book.specsTag;
           const price = book.offerData.offers[0].price;
 
-          app.setContext('results', nrOfResults, {data});
-          app.setContext('index', 1, {index: 0});
+          app.setContext('results', 5, {data, index: 0});
           app.ask(`Found ${nrOfResults} books. Going through them one by one. Say stop if you want me to stop. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
         })
         .catch((error) => {
@@ -97,7 +96,7 @@ exports.bolcomFunction= (req, res) => {
       buyState(app);
     } else {
       const data = argument.value;
-      let index = app.getContextArgument('index', 'index').value;
+      let index = app.getContextArgument('results', 'index').value;
 
       const bookTitle = data.products[index].title;
       console.log('Confirmed purchase of:');
@@ -114,14 +113,14 @@ exports.bolcomFunction= (req, res) => {
       buyState(app);
     } else {
       const data = argument.value;
-      let index = app.getContextArgument('index', 'index').value + 1;
+      let index = app.getContextArgument('results', 'index').value + 1;
 
       const book = data.products[index];
       const title = book.title;
       const author = book.specsTag;
       const price = book.offerData.offers[0].price;
 
-      app.setContext('index', 1, {index});
+      app.setContext('results', 5, {data, index});
       app.ask(`The next one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
     }
   }
