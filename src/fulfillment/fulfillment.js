@@ -88,7 +88,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmState(app) {
-    const bookTitle = app.getContextArgument('selectedbook', 'title');
+    const bookTitle = app.getContextArgument('selectedbook', 'title').value;
     console.log('Confirmed purchase of:');
     console.log(bookTitle);
     app.tell(`Ok, placing order for ${bookTitle}.`);
