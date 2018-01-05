@@ -14,6 +14,8 @@ const base = 'http://api.bol.com/catalog/v4/search';
 const ids = 8299;
 const key = process.env.KEY;
 
+const yearRegex = /(\d\d\d\d)/;
+
 exports.bolcomFunction= (req, res) => {
 
   const app = new DialogFlowApp({request: req, response: res});
@@ -35,26 +37,25 @@ exports.bolcomFunction= (req, res) => {
 
     switch(intent) {
       case BUY_INTENT:
-        return buyState(app);
+        return buyIntent(app);
         break;
       case YES_INTENT:
-        confirmState(app);
+        confirmIntent(app);
         break;
       case NO_INTENT:
-        nextState(app);
+        nextIntent(app);
         break;
       case STOP_INTENT:
-        stopState(app);
+        stopIntent(app);
+        break;
       default: 
-        unknownState(app);
+        unknownIntent(app);
     }
   }
 
   // STATE HANDLERS
 
-  function buyState(app) {
-    console.log('Buy state');
-
+  function buyIntent(app) {
     const context = app.getContext('start');
     console.log('Context:');
     console.log(context);
@@ -72,15 +73,13 @@ exports.bolcomFunction= (req, res) => {
           console.log(data);
 
           const nrOfResults = data.products.length;
-          // TODO: there is more than 1 offer. Always find the bol.com offer (new book).
-          // TODO: mechanism to send the result(s) to the user's phone.
-          const book = data.products[0];
-          const title = book.title;
-          const author = book.specsTag;
-          const price = book.offerData.offers[0].price;
+          // TODO: there is more than 1 offer. Always find the bol.com offer (new book). Skip the book if it does not have a bol.com offer.
+          // TODO: filter the list more. e.g. lord of the rings gives the similarion. Should check the name better. Or better query?
+          // TODO: Add intents to ask description, availability, etc. for the current book.
+          const book = getBook(data.products[0]);
 
           app.setContext('results', 5, {data, index: 0});
-          app.ask(`Found ${nrOfResults} books. The first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+          app.ask(`Found ${nrOfResults} books for ${bookTitle}. The first one is ${bookToString(book)}. Do you want to order this one?`);
         })
         .catch((error) => {
           console.log('Error:');
@@ -89,121 +88,113 @@ exports.bolcomFunction= (req, res) => {
         });
   }
 
-  function confirmState(app) {
+  function confirmIntent(app) {
     const context = app.getContext('results');
     if (context === null || context === undefined || context === {}) {
       // No book to confirm, redirect to the buy state
-      buyState(app);
+      buyIntent(app);
     } else {
       const data = context.parameters.data;
       let index = context.parameters.index;
       if (index === -1) {
-        const book = data.products[0];
-        const title = book.title;
-        const author = book.specsTag;
-        const price = book.offerData.offers[0].price;
-
-        app.setContext('results', 5, {data, index: 0});
-        app.ask(`Ok, the first one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+        repeatListState(app, data);
       } else {
-        const bookTitle = data.products[index].title;
-        console.log('Confirmed purchase of:');
-        console.log(bookTitle);
-        app.tell(`Ok, placing order for ${bookTitle}.`);
-        // TODO: actually do the order
+        confirmBookState(app, getBook(data.products[index]));
       }
     }
   }
 
-  function nextState(app) {
-    console.log('next state');
+  function nextIntent(app) {
     const context = app.getContext('results');
     if (context === null || context === undefined || context === {}) {
       // No products, redirect to the buy state
-      buyState(app);
+      buyIntent(app);
     } else {
       const data = context.parameters.data;
-      let index = context.parameters.index + 1;
-      if (index === 0) {
-        stopState(app);
+      let index = context.parameters.index;
+      if (index === -1) {
+        stopIntent(app);
       } else if (index == data.products.length) {
-        app.setContext('results', 5, {data, index: -1});
-        app.ask('That was the last one. Do you want to start from the beginning?');
+        endOfListState(app, data);
       } else {
-        const book = data.products[index];
-        const title = book.title;
-        const author = book.specsTag;
-        const price = book.offerData.offers[0].price;
-
-        app.setContext('results', 5, {data, index});
-        app.ask(`The next one is ${title} by ${author} for ${price} euros. Do you want to order this one?`);
+        nextBookInListState(app, data, index);
       }
     }
   }
 
-  function stopState(app) {
+  function stopIntent(app) {
     app.setContext('results', 0, {});
     app.ask('Ok, what book would you like to buy?');
   }
 
-  function confirmOrder(app) {
-    // TODO: get the delivery time from bol.com and give it to the user
-    app.tell(`Order complete. It will arrive at ${getDeliveryAddress(app)} tomorrow at 9 am.`)
+  function unknownIntent(app) {
+    console.log('Unknown intent');
+    app.tell('Something went wrong');
   }
 
-  function unknownState(app) {
-    console.log('Unknown state');
-    app.tell('Something went wrong');
+  // STATE HANDLERS
+
+  function repeatListState(app, data) {
+    const book = getBook(data.products[0]);
+    app.setContext('results', 5, {data, index: 0});
+    app.ask(`Ok, the first one is ${bookToString(book)}. Do you want to order this one?`);
+  }
+
+  function confirmBookState(app, book) {
+    console.log('Confirmed purchase of:');
+    console.log(book.title);
+    // TODO: Translate and give back the order time
+    app.tell(`Ok, placing order for ${book.title}.`);
+    // TODO: actually do the order
+  }
+
+  function endOfListState(app, data) {
+    app.setContext('results', 5, {data, index: -1});
+    app.ask('That was the last one. Do you want to start from the beginning?');
+  }
+
+  function nextBookInListState(app, data, index) {
+    index++;
+    const book = getBook(data.products[index]);
+    app.setContext('results', 5, {data, index});
+    app.ask(`The next one is ${bookToString(book)}. Do you want to order this one?`);
   }
 
   // HELPERS
 
-  function createState(state, data={}) {
-    return JSON.stringify({state, data});
+  function bookToString(book) {
+    return `${book.title} by ${book.author}, as ${book.type} in ${book.language} published in ${book.year} for ${book.price} euros`;
   }
 
-  function parseState(dialogState) {
-    console.log("Parse the dialog state");
-    console.log(dialogState);
+  function getBook(product) {
+    let title = product.title;
+    let author = product.specsTag;
+    let price = book.offerData.offers[0].price;
 
-    if (dialogState === undefined || dialogState === null)
-      return START_STATE;
+    let summary = product.summary;
+    let language = 'Unknown language';
+    if (summary.contains('Nederlandstalig'))
+      language = 'Dutch';
+    if (summary.contains('Engelstalig'))
+      language = 'English';
+    if (summary.contains('Spaanstalig'))
+      language = 'Spanish';
+    
+    type = 'Unknown type';
+    if (summary.contains('Ebook'))
+      type = 'Ebook';
+    if (summary.contains('Paperback'))
+      type = 'Paperback';
+    if (summary.contains('Hardcover'))
+      type = 'Hardcover'
 
-    console.log(typeof dialogState);
+    year = 'Unkown year';
+    if (summary.test(yearRegex))
+      year = summary.match(yearRegex)[1];
 
-    let parsedState = dialogState;
-    if (typeof dialogState === "string")
-      parsedState = JSON.parse(dialogState);
-
-    console.log(parsedState);
-    console.log(parsedState.state);
-
-    if (parsedState.state === undefined || parsedState.state === null)
-      return START_STATE;
-    else
-      return parsedState.state;
-  }
-
-  function parseData(dialogState) {
-    console.log("Parse the dialog state data");
-    console.log(dialogState);
-
-    if (dialogState === undefined || dialogState === null)
-      return {};
-
-    console.log(typeof dialogState);
-
-    let parsedState = dialogState;
-    if (typeof dialogState === "string")
-      parsedState = JSON.parse(dialogState);
-
-    console.log(parsedState);
-    console.log(parsedState.data);
-
-    if (parsedState.data === undefined || parsedState.data === null)
-      return {};
-    else
-      return parsedState.data;
+    return {
+      title, author, price, type, language, year
+    }
   }
 
   function getUserName(app) {
@@ -212,14 +203,6 @@ exports.bolcomFunction= (req, res) => {
       return 'Unknown';
     else 
       return userName.displayName;
-  }
-
-  function getDeliveryAddress(app) {
-    const deliveryAddress = app.getDeliveryAddress();
-    if (deliveryAddress === null)
-      return 'Unknown address';
-    else 
-      return deliveryAddress.address;
   }
 
   app.handleRequest(responseHandler);
