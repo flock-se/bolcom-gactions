@@ -173,19 +173,19 @@ exports.bolcomFunction= (req, res) => {
 
     let summary = product.summary;
     let language = 'Unknown language';
-    if (summary.contains('Nederlandstalig'))
+    if (summary.includes('Nederlandstalig'))
       language = 'Dutch';
-    if (summary.contains('Engelstalig'))
+    if (summary.includes('Engelstalig'))
       language = 'English';
-    if (summary.contains('Spaanstalig'))
+    if (summary.includes('Spaanstalig'))
       language = 'Spanish';
     
     type = 'Unknown type';
-    if (summary.contains('Ebook'))
+    if (summary.includes('Ebook'))
       type = 'Ebook';
-    if (summary.contains('Paperback'))
+    if (summary.includes('Paperback'))
       type = 'Paperback';
-    if (summary.contains('Hardcover'))
+    if (summary.includes('Hardcover'))
       type = 'Hardcover'
 
     year = 'Unkown year';
