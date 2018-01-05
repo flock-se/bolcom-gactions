@@ -180,7 +180,7 @@ exports.bolcomFunction= (req, res) => {
     if (summary.includes('Spaanstalig'))
       language = 'Spanish';
     
-    type = 'Unknown type';
+    let type = 'Unknown type';
     if (summary.includes('Ebook'))
       type = 'Ebook';
     if (summary.includes('Paperback'))
@@ -188,8 +188,8 @@ exports.bolcomFunction= (req, res) => {
     if (summary.includes('Hardcover'))
       type = 'Hardcover'
 
-    year = 'Unkown year';
-    if (summary.test(yearRegex))
+    let year = 'Unkown year';
+    if (yearRegex.test(summary))
       year = summary.match(yearRegex)[1];
 
     return {
