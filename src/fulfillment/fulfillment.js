@@ -169,7 +169,7 @@ exports.bolcomFunction= (req, res) => {
   function getBook(product) {
     let title = product.title;
     let author = product.specsTag;
-    let price = book.offerData.offers[0].price;
+    let price = product.offerData.offers[0].price;
 
     let summary = product.summary;
     let language = 'Unknown language';
