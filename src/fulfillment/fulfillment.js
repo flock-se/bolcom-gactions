@@ -86,7 +86,7 @@ exports.bolcomFunction= (req, res) => {
           const book = getBook(data.products[0]);
 
           app.setContext('results', 5, {data, index: 0});
-          app.ask(`Found ${nrOfResults} books for ${bookTitle}. The first one is ${bookToStringFull(book)}.`);
+          app.ask(`Found ${nrOfResults} books for ${bookTitle}. The first one is ${bookToStringSimple(book)}.`);
         })
         .catch((error) => {
           console.log('Error:');
@@ -199,7 +199,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function incorrectState(app) {
-    app.ask('Not sure what you mean. What book would you like to buy?');
+    app.ask('Not sure what you mean.');
   }
 
   // HELPERS
