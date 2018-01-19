@@ -113,7 +113,7 @@ exports.bolcomFunction= (req, res) => {
 
   function nextIntent(app) {
     const context = app.getContext('results');
-    if (contextExists(context)) {
+    if (!contextExists(context)) {
       console.log('No products, redirect to the buy state');
       buyIntent(app);
     } else {
