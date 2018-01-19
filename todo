@@ -1,0 +1,9 @@
+* releasedate (niet uit summary parsen)
+
+* helpIntent (you can confirm this book, ask more details)
+
+
+// TODO: there is more than 1 offer. Always find the bol.com offer (new book). Skip the book if it does not have a bol.com offer.
+// TODO: Add intents to ask availability, etc. for the current book.
+// TODO: Add intents for requesting the book type, language, year (do not ask the user, just give him the best option and let him change it)
+// TODO: Add intent for getting the cheapest price

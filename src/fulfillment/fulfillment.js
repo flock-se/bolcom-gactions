@@ -1,6 +1,7 @@
 'use strict';
 
 const fetch = require('node-fetch');
+const nodemailer = require('nodemailer');
 
 const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
 const YES_INTENT = 'Buyintent.Buyintent-yes';
@@ -16,7 +17,7 @@ const base = 'http://api.bol.com/catalog/v4/search';
 const ids = 8299;
 const key = process.env.KEY;
 
-const yearRegex = /(\d\d\d\d)/;
+const yearRegex = / (\d\d\d\d) /;
 
 exports.bolcomFunction= (req, res) => {
 
@@ -79,10 +80,6 @@ exports.bolcomFunction= (req, res) => {
           console.log(data);
 
           const nrOfResults = data.totalResultSize;
-          // TODO: there is more than 1 offer. Always find the bol.com offer (new book). Skip the book if it does not have a bol.com offer.
-          // TODO: Add intents to ask availability, etc. for the current book.
-          // TODO: Add intents for requesting the book type, language, year (do not ask the user, just give him the best option and let him change it)
-          // TODO: Add intent for getting the cheapest price
           const book = getBook(data.products[0]);
 
           app.setContext('results', 5, {data, index: 0});
@@ -174,10 +171,10 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function confirmBookState(app, book) {
-    console.log('Confirmed order of:');
-    console.log(book.title);
+    console.log('Sending email for:');
+    console.log(book.title);    
+    sendEmail(book);
     app.tell(`Ok, check your email. I sent you a link to finish purchasing your order`);
-    // TODO: send mail with link
   }
 
   function endOfListState(app, data) {
@@ -215,6 +212,7 @@ exports.bolcomFunction= (req, res) => {
   }
 
   function getBook(product) {
+    let id = product.id;
     let title = product.title;
     let author = product.specsTag;
     let price = product.offerData.offers[0].price;
@@ -243,7 +241,7 @@ exports.bolcomFunction= (req, res) => {
     let description = product.shortDescription;
 
     return {
-      title, author, price, type, language, year, description
+      id, title, author, price, type, language, year, description
     }
   }
 
@@ -253,6 +251,42 @@ exports.bolcomFunction= (req, res) => {
       return 'Unknown';
     else 
       return userName.displayName;
+  }
+
+  function sendEmail(book) {
+
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: 'mail.flock-se.com',
+      port: 25,
+      secure: false, // true for 465, false for other ports
+      auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PW
+      }
+    });
+
+    // setup email data with unicode symbols
+    let mailOptions = {
+        from: '"Bol.com" <bol@flock-se.com>', // sender address
+        to: 'willem.veelenturf@gmail.com, bruijnv@gmail.com', // list of receivers
+        subject: `Bol.com order for ${book.title}`, // Subject line
+        text: `https://www.bol.com/nl/p/-/${book.id}/`, // plain text body
+        html: '' // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message sent: %s', info.messageId);
+        // Preview only available when sending through an Ethereal account
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@blurdybloop.com>
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    });
   }
 
   app.handleRequest(responseHandler);

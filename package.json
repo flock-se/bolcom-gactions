@@ -5,7 +5,8 @@
     "actions-on-google": "^1.7.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^1.7.3",
+    "nodemailer": "^4.4.1"
   },
   "scripts": {
     "start": "node server.js"
