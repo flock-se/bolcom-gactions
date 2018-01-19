@@ -80,7 +80,7 @@ exports.bolcomFunction= (req, res) => {
 
           const nrOfResults = data.totalResultSize;
           // TODO: there is more than 1 offer. Always find the bol.com offer (new book). Skip the book if it does not have a bol.com offer.
-          // TODO: Add intents to ask description, availability, etc. for the current book.
+          // TODO: Add intents to ask availability, etc. for the current book.
           // TODO: Add intents for requesting the book type, language, year (do not ask the user, just give him the best option and let him change it)
           // TODO: Add intent for getting the cheapest price
           const book = getBook(data.products[0]);
@@ -142,6 +142,7 @@ exports.bolcomFunction= (req, res) => {
     } else {
       const data = context.parameters.data;
       let index = context.parameters.index;
+      app.setContext('results', 5, context.parameters);
       giveDetailsState(app, getBook(data.products[index]));
     }
   }
@@ -154,6 +155,7 @@ exports.bolcomFunction= (req, res) => {
     } else {
       const data = context.parameters.data;
       let index = context.parameters.index;
+      app.setContext('results', 5, context.parameters);
       giveDescriptionState(app, getBook(data.products[index]));
     }
   }
@@ -196,10 +198,6 @@ exports.bolcomFunction= (req, res) => {
 
   function giveDescriptionState(app, book) {
     app.ask(book.description);
-  }
-
-  function incorrectState(app) {
-    app.ask('Not sure what you mean.');
   }
 
   // HELPERS
