@@ -6,6 +6,8 @@ const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
 const YES_INTENT = 'Buyintent.Buyintent-yes';
 const NO_INTENT = 'Buyintent.Buyintent-no';
 const STOP_INTENT = 'Buyintent.Buyintent-cancel';
+const DETAILS_INTENT = 'Buyintent.Buyintent-details'
+const DESCRIPTION_INTENT = 'Buyintent.Buyintent-description'
 
 const DialogFlowApp = require('actions-on-google').DialogflowApp;
 
@@ -32,9 +34,8 @@ exports.bolcomFunction= (req, res) => {
     const contexts = app.getContexts();
     console.log('Contexts:');
     console.log(contexts);
-    console.log("User:");
-    console.log(getUserName(app));
 
+    // TODO: switch based on state and then on intent
     switch(intent) {
       case BUY_INTENT:
         return buyIntent(app);
@@ -47,6 +48,12 @@ exports.bolcomFunction= (req, res) => {
         break;
       case STOP_INTENT:
         stopIntent(app);
+        break;
+      case DETAILS_INTENT:
+        detailsIntent(app);
+        break;
+      case DESCRIPTION_INTENT:
+        descriptionIntent(app);
         break;
       default: 
         unknownIntent(app);
@@ -72,14 +79,15 @@ exports.bolcomFunction= (req, res) => {
           console.log('Fetched data:');
           console.log(data);
 
-          const nrOfResults = data.products.length;
+          const nrOfResults = data.totalResultSize;
           // TODO: there is more than 1 offer. Always find the bol.com offer (new book). Skip the book if it does not have a bol.com offer.
-          // TODO: filter the list more. e.g. lord of the rings gives the similarion. Should check the name better. Or better query?
           // TODO: Add intents to ask description, availability, etc. for the current book.
+          // TODO: Add intents for requesting the book type, language, year (do not ask the user, just give him the best option and let him change it)
+          // TODO: Add intent for getting the cheapest price
           const book = getBook(data.products[0]);
 
           app.setContext('results', 5, {data, index: 0});
-          app.ask(`Found ${nrOfResults} books for ${bookTitle}. The first one is ${bookToString(book)}. Do you want to order this one?`);
+          app.ask(`Found ${nrOfResults} books for ${bookTitle}. The first one is ${bookToStringFull(book)}.`);
         })
         .catch((error) => {
           console.log('Error:');
@@ -90,7 +98,7 @@ exports.bolcomFunction= (req, res) => {
 
   function confirmIntent(app) {
     const context = app.getContext('results');
-    if (context === null || context === undefined || context === {}) {
+    if (!contextExists(context)) {
       // No book to confirm, redirect to the buy state
       buyIntent(app);
     } else {
@@ -106,7 +114,7 @@ exports.bolcomFunction= (req, res) => {
 
   function nextIntent(app) {
     const context = app.getContext('results');
-    if (context === null || context === undefined || context === {}) {
+    if (contextExists(context)) {
       // No products, redirect to the buy state
       buyIntent(app);
     } else {
@@ -127,6 +135,30 @@ exports.bolcomFunction= (req, res) => {
     app.ask('Ok, what book would you like to buy?');
   }
 
+  function detailsIntent(app) {
+    const context = app.getContext('results');
+    if (!contextExists(context)) {
+      // TODO: handle out of context state
+      app.ask('What would you like to know more about?');
+    } else {
+      const data = context.parameters.data;
+      let index = context.parameters.index;
+      giveDetailsState(app, getBook(data.products[index]));
+    }
+  }
+
+  function descriptionIntent(app) {
+    const context = app.getContext('results');
+    if (!contextExists(context)) {
+      // TODO: handle out of context state
+      buyIntent(app);
+    } else {
+      const data = context.parameters.data;
+      let index = context.parameters.index;
+      giveDescriptionState(app, getBook(data.products[index]));
+    }
+  }
+
   function unknownIntent(app) {
     console.log('Unknown intent');
     app.tell('Something went wrong');
@@ -137,15 +169,14 @@ exports.bolcomFunction= (req, res) => {
   function repeatListState(app, data) {
     const book = getBook(data.products[0]);
     app.setContext('results', 5, {data, index: 0});
-    app.ask(`Ok, the first one is ${bookToString(book)}. Do you want to order this one?`);
+    app.ask(`Ok, the first one is ${bookToStringFull(book)}. Do you want to order this one?`);
   }
 
   function confirmBookState(app, book) {
-    console.log('Confirmed purchase of:');
+    console.log('Confirmed order of:');
     console.log(book.title);
-    // TODO: Translate and give back the order time
-    app.tell(`Ok, placing order for ${book.title}.`);
-    // TODO: actually do the order
+    app.tell(`Ok, check your email. I sent you a link to finish purchasing your order`);
+    // TODO: send mail with link
   }
 
   function endOfListState(app, data) {
@@ -157,13 +188,33 @@ exports.bolcomFunction= (req, res) => {
     index++;
     const book = getBook(data.products[index]);
     app.setContext('results', 5, {data, index});
-    app.ask(`The next one is ${bookToString(book)}. Do you want to order this one?`);
+    app.ask(`The next one is ${bookToStringFull(book)}.`);
+  }
+
+  function giveDetailsState(app, book) {
+    app.ask(bookToStringFull(book));
+  }
+
+  function giveDescriptionState(app, book) {
+    app.ask(book.description);
+  }
+
+  function incorrectState(app) {
+    app.ask('Not sure what you mean. What book would you like to buy?');
   }
 
   // HELPERS
 
-  function bookToString(book) {
-    return `${book.title} by ${book.author}, as ${book.type} in ${book.language} published in ${book.year} for ${book.price} euros`;
+  function contextExists(context) {
+    return !(context === null || context === undefined || context === {});
+  }
+
+  function bookToStringFull(book) {
+    return `${book.title} by ${book.author}, as ${book.type} in ${book.language} published in ${book.year} for ${book.price} euros.`;
+  }
+
+  function bookToStringSimple(book) {
+    return `${book.title} by ${book.author}`;
   }
 
   function getBook(product) {
@@ -192,8 +243,10 @@ exports.bolcomFunction= (req, res) => {
     if (yearRegex.test(summary))
       year = summary.match(yearRegex)[1];
 
+    let description = product.shortDescription;
+
     return {
-      title, author, price, type, language, year
+      title, author, price, type, language, year, description
     }
   }
 
