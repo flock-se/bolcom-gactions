@@ -6,7 +6,7 @@ const BUY_INTENT = 'DefaultWelcomeIntent.DefaultWelcomeIntent-custom';
 const YES_INTENT = 'Buyintent.Buyintent-yes';
 const NO_INTENT = 'Buyintent.Buyintent-no';
 const STOP_INTENT = 'Buyintent.Buyintent-cancel';
-const DETAILS_INTENT = 'Buyintent.Buyintent-details'
+const DETAILS_INTENT = 'BuyIntent.Buyintent-details'
 const DESCRIPTION_INTENT = 'Buyintent.Buyintent-description'
 
 const DialogFlowApp = require('actions-on-google').DialogflowApp;
@@ -39,7 +39,6 @@ exports.bolcomFunction= (req, res) => {
     switch(intent) {
       case BUY_INTENT:
         return buyIntent(app);
-        break;
       case YES_INTENT:
         confirmIntent(app);
         break;
@@ -169,7 +168,7 @@ exports.bolcomFunction= (req, res) => {
   function repeatListState(app, data) {
     const book = getBook(data.products[0]);
     app.setContext('results', 5, {data, index: 0});
-    app.ask(`Ok, the first one is ${bookToStringFull(book)}. Do you want to order this one?`);
+    app.ask(`Ok, the first one is ${bookToStringSimple(book)}. Do you want to order this one?`);
   }
 
   function confirmBookState(app, book) {
@@ -188,7 +187,7 @@ exports.bolcomFunction= (req, res) => {
     index++;
     const book = getBook(data.products[index]);
     app.setContext('results', 5, {data, index});
-    app.ask(`The next one is ${bookToStringFull(book)}.`);
+    app.ask(`The next one is ${bookToStringSimple(book)}.`);
   }
 
   function giveDetailsState(app, book) {
