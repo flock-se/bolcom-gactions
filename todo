@@ -1,4 +1,4 @@
-1. test voor elke state/intent
+1. test voor elke state/intent. 
 
 2. Bepaal eerst de state waar we inzitten, process dan de intent voor die state.
 

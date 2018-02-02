@@ -10,8 +10,8 @@ const app = express();
 app.use(bodyParser.json({type: 'application/json'}));
 
 app.post('/', function(request, response) {
-  console.log('headers:' + JSON.stringify(request.headers));
-  console.log('body:' + JSON.stringify(request.body));
+  //console.log('headers:' + JSON.stringify(request.headers));
+  //console.log('body:' + JSON.stringify(request.body));
 
   response.append("Google-Assistant-API-Version", "v1");
   bolcomFunction(request, response);
