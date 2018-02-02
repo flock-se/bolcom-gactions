@@ -63,7 +63,7 @@ exports.bolcomFunction= (req, res) => {
   // STATE HANDLERS
 
   function buyIntent(app) {
-    const context = app.getContext('start');
+    const context = app.getContext('buyintent-followup');
     console.log('Context:');
     console.log(context);
     
@@ -174,7 +174,7 @@ exports.bolcomFunction= (req, res) => {
     console.log('Sending email for:');
     console.log(book.title);    
     sendEmail(book);
-    app.tell(`Ok, check your email. I sent you a link to finish purchasing your order`);
+    app.tell(`Ok, check your email. I sent you a link to finish purchasing your order. Thanks for using the Bol dot com app!`);
   }
 
   function endOfListState(app, data) {
@@ -282,11 +282,13 @@ exports.bolcomFunction= (req, res) => {
         }
         console.log('Message sent: %s', info.messageId);
         // Preview only available when sending through an Ethereal account
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+       // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
         // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@blurdybloop.com>
         // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
     });
+
+    transporter.close();
   }
 
   app.handleRequest(responseHandler);
